@@ -124,7 +124,6 @@ body.cur-click .c-ring{width:24px;height:24px;}
   transition:background .4s,border-color .4s,transform .2s var(--ease-spring);
   flex-shrink:0;overflow:hidden;
 }
-
 nav.sc #thm{background:rgba(107,58,94,.12);border-color:rgba(107,58,94,.28);}
 body.night nav.sc #thm{background:rgba(200,151,90,.1);border-color:rgba(200,151,90,.28);}
 #thm:hover{transform:scale(1.07);}
@@ -911,6 +910,7 @@ body.night .tcard:hover .tavatar::after{background:#1C1228;}
 .tn{font-size:12px;font-weight:600;color:var(--plum);letter-spacing:1px;transition:color .65s;}
 .tl{font-size:10px;color:var(--muted);transition:color .65s;}
 
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
 /* ── BOOKING ─────────────────────────────────────────── */
 #booking{background:var(--dark);text-align:center;position:relative;overflow:hidden;}
 .bk-orb{position:absolute;border-radius:50%;filter:blur(70px);will-change:transform;}
@@ -942,7 +942,7 @@ body.night .tcard:hover .tavatar::after{background:#1C1228;}
   background:linear-gradient(135deg,var(--rose),var(--plum));
   color:#fff;border:none;padding:20px;border-radius:13px;
   font-family:'Josefin Sans',sans-serif;font-size:11px;letter-spacing:4px;text-transform:uppercase;
-  cursor:none;position:relative;overflow:hidden;
+  cursor:pointer;position:relative;overflow:hidden;
   transition:transform .25s var(--ease-spring),box-shadow .3s var(--ease);
   box-shadow:0 6px 30px rgba(201,98,109,.3);
 }
@@ -1141,12 +1141,18 @@ footer{background:var(--dark);padding:64px 60px 32px;}
   #btt{bottom:80px;right:20px;}
 }
 @media(max-width:600px){
+  .bk-form{grid-template-columns:1fr;gap:12px;}
+  .bk-form .fw,.bk-form .btn-bk{grid-column:1;}
+  .bk-form input,.bk-form select{min-height:50px;}
   .svc-grid,.team-grid,.testi-grid{grid-template-columns:1fr;}
   .ftop{grid-template-columns:1fr;}
   .hero-h1{font-size:clamp(38px,11vw,68px);}
   .otp-box{width:42px;height:50px;font-size:20px;}
 }
 @media(max-width:600px){
+  .bk-form{grid-template-columns:1fr;gap:12px;}
+  .bk-form .fw,.bk-form .btn-bk{grid-column:1;}
+  .bk-form input,.bk-form select{min-height:50px;}
   .svc-grid,.team-grid,.testi-grid{grid-template-columns:1fr;}
   .ftop{grid-template-columns:1fr;}
   .hero-h1{font-size:clamp(42px,12vw,72px);}
@@ -1492,83 +1498,36 @@ footer{background:var(--dark);padding:64px 60px 32px;}
 <!-- BOOKING -->
 <section id="booking">
   <div class="bk-orb bo1"></div><div class="bk-orb bo2"></div><div class="bk-orb bo3"></div>
-
   <div class="rv" style="position:relative;z-index:2;">
     <span class="stag">Reserve Your Spot</span>
     <h2 class="stit">Book Your <em>Appointment</em></h2>
-    <p class="ssub">Fill in your details, verify your email with OTP, and you're confirmed!</p>
+    <p class="ssub">Share your preferred service and time with us on WhatsApp. We’ll reply to confirm availability.</p>
   </div>
-
-  <!-- STEP INDICATOR -->
-  <div class="step-ind rv" style="position:relative;z-index:2;">
-    <div class="si active" id="si1"><div class="snum">1</div><div class="slbl">Details</div></div>
-    <div class="sline" id="sl1"></div>
-    <div class="si" id="si2"><div class="snum">2</div><div class="slbl">Verify OTP</div></div>
-    <div class="sline" id="sl2"></div>
-    <div class="si" id="si3"><div class="snum">3</div><div class="slbl">Confirmed</div></div>
-  </div>
-
-  <!-- STEP 1: FORM -->
-  <div id="step1" style="position:relative;z-index:2;max-width:680px;margin:0 auto;">
-    <form class="bk-form rv" onsubmit="sendOTP(event)">
-      <input type="text"  id="f-name"    placeholder="Your Full Name"   required autocomplete="name">
-      <input type="tel"   id="f-phone"   placeholder="Phone Number"      required autocomplete="tel" pattern="[0-9]{10}">
-      <input type="email" id="f-email"   placeholder="Email Address ✉️"  required autocomplete="email" class="fw">
+  <div style="position:relative;z-index:2;max-width:680px;margin:0 auto;">
+    <form class="bk-form rv" id="bookingForm">
+      <label class="sr-only" for="f-name">Your full name</label>
+      <input type="text" id="f-name" placeholder="Your Full Name" required autocomplete="name" maxlength="80">
+      <label class="sr-only" for="f-phone">Your phone number</label>
+      <input type="tel" id="f-phone" placeholder="Your Phone Number" required autocomplete="tel" inputmode="tel" pattern="[0-9+() -]{7,20}" maxlength="20">
+      <label class="sr-only" for="f-email">Your email address (optional)</label>
+      <input type="email" id="f-email" placeholder="Email Address (optional)" autocomplete="email" class="fw">
+      <label class="sr-only" for="f-service">Choose a service</label>
       <select id="f-service" required>
         <option value="" disabled selected>Select Service</option>
-        <option>Hair Styling</option>
-        <option>Bridal Package</option>
-        <option>Glow Facial</option>
-        <option>Hair Coloring</option>
-        <option>Nail Art</option>
-        <option>Keratin Treatment</option>
+        <option>Hair Styling</option><option>Bridal Package</option><option>Glow Facial</option>
+        <option>Hair Coloring</option><option>Nail Art</option><option>Keratin Treatment</option>
       </select>
+      <label class="sr-only" for="f-date">Preferred date</label>
       <input type="date" id="f-date" required>
-      <button type="submit" class="btn-bk" id="sendOtpBtn"><span id="sendOtpTxt">✨ Send OTP to Email</span></button>
+      <label class="sr-only" for="f-time">Preferred time</label>
+      <input type="time" id="f-time" required aria-label="Preferred appointment time">
+      <label class="sr-only" for="f-note">Additional request (optional)</label>
+      <input type="text" id="f-note" class="fw" placeholder="Anything else we should know? (optional)" maxlength="300">
+      <button type="submit" class="btn-bk" id="bookingSubmit"><span id="bookingSubmitText">💬 Continue to WhatsApp</span></button>
     </form>
-    <p style="color:rgba(255,255,255,.28);font-size:11px;letter-spacing:1.5px;margin-top:16px;text-align:center;">📧 A 6-digit OTP will be sent to your email for verification.</p>
-  </div>
-
-  <!-- STEP 2: OTP -->
-  <div id="step2" style="display:none;position:relative;z-index:2;max-width:500px;margin:0 auto;">
-    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:44px 36px;text-align:center;">
-      <div style="font-size:50px;margin-bottom:16px;animation:mailB 2s ease-in-out infinite;">📬</div>
-      <h3 style="font-family:'Playfair Display',serif;font-size:24px;color:#fff;margin-bottom:10px;font-weight:400;">Check Your Email</h3>
-      <p id="otp-sent-to" style="font-size:12px;color:rgba(255,255,255,.4);letter-spacing:1px;margin-bottom:32px;"></p>
-      <div class="otp-row" id="otpBoxes">
-        <input class="otp-box" type="text" maxlength="1" inputmode="numeric">
-        <input class="otp-box" type="text" maxlength="1" inputmode="numeric">
-        <input class="otp-box" type="text" maxlength="1" inputmode="numeric">
-        <input class="otp-box" type="text" maxlength="1" inputmode="numeric">
-        <input class="otp-box" type="text" maxlength="1" inputmode="numeric">
-        <input class="otp-box" type="text" maxlength="1" inputmode="numeric">
-      </div>
-      <p id="otp-timer-txt" style="font-size:11px;color:rgba(255,255,255,.32);letter-spacing:2px;margin-bottom:20px;">Resend OTP in <span id="tcnt">60</span>s</p>
-      <button class="btn-bk" style="width:100%;" onclick="verifyOTP()"><span id="verifyTxt">✅ Verify &amp; Confirm Booking</span></button>
-      <button onclick="goStep1()" style="background:none;border:none;color:rgba(255,255,255,.35);font-family:'Josefin Sans',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:none;margin-top:14px;display:block;width:100%;transition:color .3s;" onmouseover="this.style.color='rgba(255,255,255,.75)'" onmouseout="this.style.color='rgba(255,255,255,.35)'">← Back to Form</button>
-      <button id="resendBtn" onclick="resendOTP()" disabled style="background:none;border:none;color:rgba(200,151,90,.5);font-family:'Josefin Sans',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:none;margin-top:8px;display:block;width:100%;transition:color .3s,opacity .3s;opacity:.4;">Resend OTP</button>
+      <p id="bookingStatus" role="status" aria-live="polite" style="color:rgba(255,255,255,.8);font-size:13px;margin:16px auto 0;min-height:1.5em;"></p>
     </div>
-  </div>
-
-  <!-- STEP 3: SUCCESS -->
-  <div id="step3" style="display:none;position:relative;z-index:2;max-width:500px;margin:0 auto;">
-    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:50px 36px;text-align:center;">
-      <div style="width:88px;height:88px;margin:0 auto 22px;">
-        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="40" cy="40" r="37" stroke="url(#cg)" stroke-width="2.5" stroke-dasharray="233" stroke-dashoffset="233" style="animation:drawC .7s ease forwards;"/>
-          <path d="M22 41L34 53L58 27" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="60" stroke-dashoffset="60" style="animation:drawK .5s ease .65s forwards;"/>
-          <defs><linearGradient id="cg" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#C9626D"/><stop offset="100%" stop-color="#C8975A"/></linearGradient></defs>
-        </svg>
-      </div>
-      <h3 style="font-family:'Playfair Display',serif;font-size:26px;color:#fff;margin-bottom:10px;font-weight:400;">Booking Confirmed! 🎉</h3>
-      <p id="success-msg" style="font-size:12px;color:rgba(255,255,255,.45);letter-spacing:1px;margin-bottom:24px;"></p>
-      <div id="success-detail" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:18px 22px;margin-bottom:24px;font-size:12px;color:rgba(255,255,255,.55);letter-spacing:1px;line-height:2.3;text-align:left;"></div>
-      <button class="btn-bk" style="width:100%;" onclick="resetBooking()"><span>📅 Book Another Appointment</span></button>
-    </div>
-  </div>
-
 </section>
-
 <!-- CONTACT -->
 <section id="contact">
   <div class="rv-l">
@@ -1577,30 +1536,31 @@ footer{background:var(--dark);padding:64px 60px 32px;}
     <p class="ssub">We'd love to welcome you. Walk in or book ahead — beauty awaits.</p>
     <div class="cinfo">
       <div class="citem rv d1"><div class="cion">📍</div><div><div class="clbl">Address</div><div class="cval">E/286, Sapana Nagar, Gandhidham, Kutch — Gujarat</div></div></div>
-      <div class="citem rv d2"><div class="cion">📞</div><div><div class="clbl">Phone &amp; WhatsApp</div><div class="cval">+91 92270 59954</div></div></div>
+      <div class="citem rv d2"><div class="cion">📞</div><div><div class="clbl">Phone &amp; WhatsApp</div><div class="cval"><a href="https://wa.me/919227059954" target="_blank" rel="noopener">+91 92270 59954</a></div></div></div>
       <div class="citem rv d3"><div class="cion">🕐</div><div><div class="clbl">Working Hours</div><div class="cval">Mon – Sun: 9:00 AM – 9:00 PM</div></div></div>
-      <div class="citem rv d4"><div class="cion">📧</div><div><div class="clbl">Email</div><div class="cval">maheksalon8@gmail.com</div></div></div>
+      <div class="citem rv d4"><div class="cion">📧</div><div><div class="clbl">Email</div><div class="cval"><a href="mailto:maheksalon8@gmail.com">maheksalon8@gmail.com</a></div></div></div>
     </div>
   </div>
- <div class="cmap rv-r">
-
-    <iframe
-        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3671.047412896025!2d70.11180207514174!3d23.058723279148385!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3950b91a4c3756af:0xe90f5650947d53b7!2sMahek+salon!5e0!3m2!1sen!2sin!4v1789472342952!5m2!1sen!2sin"
-        loading="lazy"
-        allowfullscreen
-        referrerpolicy="strict-origin-when-cross-origin">
+  <div class="cmap rv-r">
+    <!-- Google Maps iframe as background -->
+     <iframe
+      src="https://maps.google.com/maps?q=Sapana+Nagar+Gandhidham+Kutch+Gujarat+India&z=15&output=embed"
+      loading="lazy"
+      allowfullscreen
+      
+      >
     </iframe>
-
+    <!-- Gradient overlay with address info -->
     <div class="cmap-overlay">
-        <div class="map-txt">Mahek Salon</div>
-        <div class="map-sub2">
-            E/286, Sapana Nagar, Gandhidham, Kutch — Gujarat
-        </div>
+      
+      <div class="map-txt">Mahek Salon</div>
+      <div class="map-sub2">E/286, Sapana Nagar, Gandhidham, Kutch — Gujarat</div>
+
+<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3671.047412896025!2d70.11180207514174!3d23.058723279148385!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3950b91a4c3756af%3A0xe90f5650947d53b7!2sMahek%20salon!5e0!3m2!1sen!2sin!4v1789472342952!5m2!1sen!2sin" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+
+      
     </div>
-
-</div>
-
-
+  </div>
 </section>
 
 <!-- FOOTER -->
@@ -1643,7 +1603,7 @@ footer{background:var(--dark);padding:64px 60px 32px;}
     </div>
     <div class="fcol"><h4>Services</h4><ul><li><a href="#services">Hair Styling</a></li><li><a href="#services">Bridal Makeup</a></li><li><a href="#services">Facials</a></li><li><a href="#services">Nail Art</a></li><li><a href="#services">Keratin Treatment</a></li></ul></div>
     <div class="fcol"><h4>Quick Links</h4><ul><li><a href="#about">About Us</a></li><li><a href="#team">Our Team</a></li><li><a href="#gallery">Gallery</a></li><li><a href="#testimonials">Reviews</a></li><li><a href="#booking">Book Now</a></li></ul></div>
-    <div class="fcol"><h4>Contact</h4><ul><li><a href="#">E/286, Sapana Nagar</a></li><li><a href="#">Gandhidham, Kutch, Gujarat</a></li><li><a href="https://wa.me/919227059954" target="_blank">+91 92270 59954</a></li><li><a href="#">maheksalon8@gmail.com</a></li><li><a href="#">Mon–Sun 9AM–9PM</a></li></ul></div>
+    <div class="fcol"><h4>Contact</h4><ul><li><a href="#">E/286, Sapana Nagar</a></li><li><a href="#">Gandhidham, Kutch, Gujarat</a></li><li><a href="https://wa.me/919227059954" target="_blank">+91 92270 59954</a></li><li><a href="mailto:maheksalon8@gmail.com">maheksalon8@gmail.com</a></li><li><a href="#">Mon–Sun 9AM–9PM</a></li></ul></div>
   </div>
   <div class="fbot"><span>© 2025 Mahek Salon. All rights reserved.</span><span>Made by swayam </span></div>
 </footer>
@@ -1887,148 +1847,27 @@ function checkMobThm(){if(thmMob)thmMob.style.display=innerWidth<=900?'block':'n
 checkMobThm();window.addEventListener('resize',checkMobThm,{passive:true});
 </script>
 
-<!-- EMAILJS SDK -->
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
-/* ════════════════════════════════════════════════════
-   EMAILJS CONFIG
-════════════════════════════════════════════════════ */
-const EJ_PUB   = 'KMvmgcC1RG4Bjf_Hb';
-const EJ_SVC   = 'service_ke0tf4c';
-const EJ_OTP   = 'template_cb6kx1p';
-const EJ_ADMIN = 'template_z51z63r';
-const ADMIN_EMAIL = 'hello@maheksalon.com';
-emailjs.init(EJ_PUB);
-
-/* ── STATE ──────────────────────────────────────── */
-let _otp='', _timer=null, _data={};
-
-/* ── HELPERS ────────────────────────────────────── */
-function fmt(d){if(!d)return '';const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});}
-function mask(e){const[u,d]=e.split('@');return u.slice(0,2)+'****@'+d;}
-function genOTP(){return String(Math.floor(100000+Math.random()*900000));}
-function setStep(n){
-  ['step1','step2','step3'].forEach((id,i)=>{document.getElementById(id).style.display=i+1===n?'block':'none';});
-  [1,2,3].forEach(i=>{const el=document.getElementById('si'+i);el.classList.toggle('active',i===n);el.classList.toggle('done',i<n);});
-  [1,2].forEach(i=>document.getElementById('sl'+i).classList.toggle('done',i<n));
-}
-
-/* ── STEP 1: SEND OTP ───────────────────────────── */
-async function sendOTP(e){
+/* Open a prefilled WhatsApp booking message directly from the standalone page. */
+const bookingDate=document.getElementById('f-date');
+if(bookingDate){const now=new Date();bookingDate.min=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,10);}
+document.querySelectorAll('.sb-btn').forEach(button=>button.addEventListener('click',()=>{
+  const service=button.closest('.svc-back')?.querySelector('h3')?.textContent.trim();
+  const select=document.getElementById('f-service');
+  if(service&&select){select.value=service;document.getElementById('booking').scrollIntoView({behavior:'smooth'});}
+}));
+document.getElementById('bookingForm')?.addEventListener('submit',function(e){
   e.preventDefault();
-  const name=document.getElementById('f-name').value.trim();
-  const phone=document.getElementById('f-phone').value.trim();
-  const email=document.getElementById('f-email').value.trim();
-  const service=document.getElementById('f-service').value;
-  const date=document.getElementById('f-date').value;
-  if(!name||!phone||!email||!service||!date){showToast('⚠️ Please fill all fields!');return;}
-  _data={name,phone,email,service,date,booked_on:new Date().toLocaleString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})};
-  _otp=genOTP();
-  console.log('📧 Sending OTP to:',email,'| OTP:',_otp);
-  console.log('Service:',EJ_SVC,'| Template:',EJ_OTP,'| Key:',EJ_PUB);
-  const btn=document.getElementById('sendOtpBtn'),txt=document.getElementById('sendOtpTxt');
-  txt.innerHTML='<span class="spin-ldr"></span>Sending OTP…';btn.disabled=true;
-  try{
-    const res = await emailjs.send(EJ_SVC, EJ_OTP, {
-      to_email  : email,
-      user_name : name,
-      otp_code  : _otp,
-      service   : service,
-      date      : fmt(date),
-      phone     : phone,
-    });
-    console.log('✅ EmailJS response:', res.status, res.text);
-    setStep(2);
-    document.getElementById('otp-sent-to').textContent='OTP sent to '+mask(email);
-    startTimer();
-    setTimeout(()=>document.querySelector('.otp-box')?.focus(),200);
-    showToast('✅ OTP sent to '+email);
-  }catch(err){
-    console.error('❌ EmailJS Error:', err);
-    const msg = err && err.text ? err.text : JSON.stringify(err);
-    showToast('❌ Error: '+msg);
-    alert('EmailJS Error — check console (F12):\n\n'+msg);
-  }finally{txt.innerHTML='✨ Send OTP to Email';btn.disabled=false;}
-}
-
-/* ── STEP 2: VERIFY OTP ─────────────────────────── */
-async function verifyOTP(){
-  const boxes=[...document.querySelectorAll('.otp-box')];
-  const entered=boxes.map(b=>b.value).join('');
-  if(entered.length<6){showToast('⚠️ Enter all 6 digits');boxes.forEach(b=>b.classList.add('err'));setTimeout(()=>boxes.forEach(b=>b.classList.remove('err')),450);return;}
-  if(entered===_otp){
-    clearInterval(_timer);
-    const vt=document.getElementById('verifyTxt');
-    vt.innerHTML='<span class="spin-ldr"></span>Confirming…';
-    document.querySelector('#step2 .btn-bk').disabled=true;
-    try{
-      await emailjs.send(EJ_SVC,EJ_ADMIN,{to_email:ADMIN_EMAIL,user_name:_data.name,cust_email:_data.email,phone:_data.phone,service:_data.service,date:fmt(_data.date),booked_on:_data.booked_on});
-    }catch(err){console.warn('Admin email failed:',err);}
-    document.getElementById('success-msg').textContent='Thank you, '+_data.name+'! Your appointment has been confirmed.';
-    document.getElementById('success-detail').innerHTML=`<strong style="color:#C8975A;">Name</strong> &nbsp;: ${_data.name}<br><strong style="color:#C8975A;">Phone</strong> &nbsp;: ${_data.phone}<br><strong style="color:#C8975A;">Email</strong> &nbsp;: ${_data.email}<br><strong style="color:#C8975A;">Service</strong> : ${_data.service}<br><strong style="color:#C8975A;">Date</strong> &nbsp;: ${fmt(_data.date)}<br><strong style="color:#25D366;">Status</strong> &nbsp;: ✅ Verified & Confirmed`;
-    setStep(3);
-    showToast('🎉 Booking confirmed!');
-  }else{
-    boxes.forEach(b=>{b.classList.add('err');b.style.borderColor='';});
-    setTimeout(()=>boxes.forEach(b=>b.classList.remove('err')),450);
-    showToast('❌ Wrong OTP. Please try again.');
-  }
-}
-
-/* ── TIMER ──────────────────────────────────────── */
-function startTimer(){
-  let s=60;
-  const cnt=document.getElementById('tcnt');
-  const rb=document.getElementById('resendBtn');
-  const tt=document.getElementById('otp-timer-txt');
-  rb.disabled=true;rb.style.opacity='.4';
-  clearInterval(_timer);
-  _timer=setInterval(()=>{
-    s--;cnt.textContent=s;
-    if(s<=0){clearInterval(_timer);tt.textContent='OTP expired.';rb.disabled=false;rb.style.opacity='1';}
-  },1000);
-}
-
-async function resendOTP(){
-  _otp=genOTP();
-  document.querySelectorAll('.otp-box').forEach(b=>{b.value='';b.classList.remove('filled');});
-  try{
-    await emailjs.send(EJ_SVC,EJ_OTP,{to_email:_data.email,user_name:_data.name,otp_code:_otp,service:_data.service,date:fmt(_data.date),phone:_data.phone});
-    showToast('📧 New OTP sent!');startTimer();
-    setTimeout(()=>document.querySelector('.otp-box')?.focus(),200);
-  }catch(e){showToast('❌ Could not resend OTP.');}
-}
-
-/* ── NAVIGATION ─────────────────────────────────── */
-function goStep1(){clearInterval(_timer);setStep(1);}
-function resetBooking(){
-  setStep(1);
-  ['f-name','f-phone','f-email','f-date'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('f-service').value='';
-  document.querySelectorAll('.otp-box').forEach(b=>{b.value='';b.classList.remove('filled','err');});
-  _otp='';_data={};
-}
-
-/* ── OTP BOX AUTO-ADVANCE ───────────────────────── */
-document.addEventListener('DOMContentLoaded',()=>{
-  const boxes=[...document.querySelectorAll('.otp-box')];
-  boxes.forEach((box,i)=>{
-    box.addEventListener('input',()=>{
-      box.value=box.value.replace(/\D/g,'').slice(-1);
-      box.classList.toggle('filled',box.value!=='');
-      if(box.value&&i<boxes.length-1)boxes[i+1].focus();
-      if(boxes.every(b=>b.value!==''))setTimeout(verifyOTP,200);
-    });
-    box.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!box.value&&i>0)boxes[i-1].focus();});
-    box.addEventListener('paste',e=>{
-      e.preventDefault();
-      const p=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
-      p.split('').forEach((c,j)=>{if(boxes[j]){boxes[j].value=c;boxes[j].classList.add('filled');}});
-      if(p.length===6){boxes[5].focus();setTimeout(verifyOTP,200);}
-    });
-  });
-});
-
+  if(!this.reportValidity())return;
+  const v=id=>document.getElementById(id).value.trim();
+  const date=new Date(v('f-date')+'T00:00:00').toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const lines=['Hello Mahek Salon, I would like to request an appointment.','',`Name: ${v('f-name')}`,`Phone: ${v('f-phone')}`,v('f-email')?`Email: ${v('f-email')}`:'',`Service: ${v('f-service')}`,`Preferred date: ${date}`,`Preferred time: ${v('f-time')}`,v('f-note')?`Note: ${v('f-note')}`:''].filter(Boolean);
+  const url='https://wa.me/919227059954?text='+encodeURIComponent(lines.join('\n'));
+  window.open(url,'_blank','noopener,noreferrer');
+  const status=document.getElementById('bookingStatus');
+  if(status)status.textContent='WhatsApp opened with your booking message. Please tap Send in WhatsApp to contact Mahek Salon.';
+});</script>
+<script>
 /* ── TYPEWRITER ──────────────────────────────────────── */
 (function(){
   const words=[
