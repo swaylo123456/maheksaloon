@@ -1501,7 +1501,7 @@ footer{background:var(--dark);padding:64px 60px 32px;}
   <div class="rv" style="position:relative;z-index:2;">
     <span class="stag">Reserve Your Spot</span>
     <h2 class="stit">Book Your <em>Appointment</em></h2>
-    <p class="ssub">Share your preferred service and time with us on WhatsApp. We’ll reply to confirm availability.</p>
+
   </div>
   <div style="position:relative;z-index:2;max-width:680px;margin:0 auto;">
     <form class="bk-form rv" id="bookingForm">
@@ -1523,7 +1523,7 @@ footer{background:var(--dark);padding:64px 60px 32px;}
       <input type="time" id="f-time" required aria-label="Preferred appointment time">
       <label class="sr-only" for="f-note">Additional request (optional)</label>
       <input type="text" id="f-note" class="fw" placeholder="Anything else we should know? (optional)" maxlength="300">
-      <button type="submit" class="btn-bk" id="bookingSubmit"><span id="bookingSubmitText">💬 Continue to WhatsApp</span></button>
+      <button type="submit" class="btn-bk" id="bookingSubmit"><span id="bookingSubmitText">✨ Book Appointment</span></button>
     </form>
       <p id="bookingStatus" role="status" aria-live="polite" style="color:rgba(255,255,255,.8);font-size:13px;margin:16px auto 0;min-height:1.5em;"></p>
     </div>
@@ -1847,8 +1847,14 @@ function checkMobThm(){if(thmMob)thmMob.style.display=innerWidth<=900?'block':'n
 checkMobThm();window.addEventListener('resize',checkMobThm,{passive:true});
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
-/* Open a prefilled WhatsApp booking message directly from the standalone page. */
+/* Submit booking details by email using the existing EmailJS setup. */
+const EJ_PUBLIC_KEY='KMvmgcC1RG4Bjf_Hb';
+const EJ_SERVICE_ID='service_ke0tf4c';
+const EJ_BOOKING_TEMPLATE='template_z51z63r';
+const SALON_EMAIL='maheksalon8@gmail.com';
+emailjs.init({publicKey:EJ_PUBLIC_KEY});
 const bookingDate=document.getElementById('f-date');
 if(bookingDate){const now=new Date();bookingDate.min=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,10);}
 document.querySelectorAll('.sb-btn').forEach(button=>button.addEventListener('click',()=>{
@@ -1856,17 +1862,36 @@ document.querySelectorAll('.sb-btn').forEach(button=>button.addEventListener('cl
   const select=document.getElementById('f-service');
   if(service&&select){select.value=service;document.getElementById('booking').scrollIntoView({behavior:'smooth'});}
 }));
-document.getElementById('bookingForm')?.addEventListener('submit',function(e){
+document.getElementById('bookingForm')?.addEventListener('submit',async function(e){
   e.preventDefault();
   if(!this.reportValidity())return;
   const v=id=>document.getElementById(id).value.trim();
-  const date=new Date(v('f-date')+'T00:00:00').toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  const lines=['Hello Mahek Salon, I would like to request an appointment.','',`Name: ${v('f-name')}`,`Phone: ${v('f-phone')}`,v('f-email')?`Email: ${v('f-email')}`:'',`Service: ${v('f-service')}`,`Preferred date: ${date}`,`Preferred time: ${v('f-time')}`,v('f-note')?`Note: ${v('f-note')}`:''].filter(Boolean);
-  const url='https://wa.me/919227059954?text='+encodeURIComponent(lines.join('\n'));
-  window.open(url,'_blank','noopener,noreferrer');
   const status=document.getElementById('bookingStatus');
-  if(status)status.textContent='WhatsApp opened with your booking message. Please tap Send in WhatsApp to contact Mahek Salon.';
-});</script>
+  const button=document.getElementById('bookingSubmit');
+  const buttonText=document.getElementById('bookingSubmitText');
+  const appointmentDate=new Date(v('f-date')+'T00:00:00').toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  button.disabled=true;buttonText.textContent='Sending booking…';status.textContent='';
+  try{
+    await emailjs.send(EJ_SERVICE_ID,EJ_BOOKING_TEMPLATE,{
+      to_email:SALON_EMAIL,
+      user_name:v('f-name'),
+      cust_email:v('f-email'),
+      phone:v('f-phone'),
+      service:v('f-service'),
+      date:appointmentDate+' at '+v('f-time'),
+      time:v('f-time'),
+      notes:v('f-note')||'None',
+      booked_on:'Received '+new Date().toLocaleString('en-IN')+' | Preferred time: '+v('f-time')+' | Note: '+(v('f-note')||'None')
+    });
+    status.textContent='Appointment booked successfully!';
+    this.reset();
+  }catch(error){
+    status.textContent='We could not send your booking. Please try again or contact us at maheksalon8@gmail.com.';
+  }finally{
+    button.disabled=false;buttonText.textContent='✨ Book Appointment';
+  }
+});
+</script>
 <script>
 /* ── TYPEWRITER ──────────────────────────────────────── */
 (function(){
